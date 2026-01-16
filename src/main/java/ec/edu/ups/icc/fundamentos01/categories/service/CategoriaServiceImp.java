@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ec.edu.ups.icc.fundamentos01.categories.dto.CategoriaResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.dto.CategoryResponseDto;
 import ec.edu.ups.icc.fundamentos01.categories.dto.CreateCategoriaDto;
 import ec.edu.ups.icc.fundamentos01.categories.entity.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.categories.repository.CategoryRepository;
@@ -30,9 +30,9 @@ public class CategoriaServiceImp implements CategoriaService {
     }
 
     @Override
-    public List<CategoriaResponseDto> getAll() {
+    public List<CategoryResponseDto> getAll() {
         return categoryRepository.findAll().stream().map(category -> {
-            CategoriaResponseDto dto = new CategoriaResponseDto();
+            CategoryResponseDto dto = new CategoryResponseDto();
             dto.id = category.getId();
             dto.nombre = category.getName();
             dto.descripcion = category.getDescription();

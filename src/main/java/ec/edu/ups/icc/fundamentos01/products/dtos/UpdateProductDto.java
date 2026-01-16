@@ -1,5 +1,7 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
+import java.util.Set;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,7 +20,8 @@ public class UpdateProductDto {
     @Size(max = 500)
     public String description;
 
-    public Long categoryId;
+    @Size(min = 1, message = "El producto debe tener al menos una categoría")
+    public Set<Long> categoryIds; // Múltiples categorías
 
     /// NO PUEDO ACTUALIZAR EL DUEÑO DEL PRODUCTO
     /// public Long userId;

@@ -1,6 +1,8 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
-import ec.edu.ups.icc.fundamentos01.categories.dto.CategoriaResponseDto;
+import java.util.List;
+
+import ec.edu.ups.icc.fundamentos01.categories.dto.CategoryResponseDto;
 
 public class ProductResponseDto {
     public int id;
@@ -11,7 +13,7 @@ public class ProductResponseDto {
     // aparesca sus categorias y su dueño
     public UserSummaryDto user;
 
-    public CategoriaResponseDto category;
+    public List<CategoryResponseDto> categories;
 
     public static class UserSummaryDto {
         public int id;

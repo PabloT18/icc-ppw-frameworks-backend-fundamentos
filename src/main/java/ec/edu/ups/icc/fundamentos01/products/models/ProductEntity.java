@@ -1,5 +1,8 @@
 package ec.edu.ups.icc.fundamentos01.products.models;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import ec.edu.ups.icc.fundamentos01.categories.entity.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.core.entities.BaseModel;
 import ec.edu.ups.icc.fundamentos01.users.models.UserEntity;
@@ -25,9 +28,12 @@ public class ProductEntity extends BaseModel {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity owner;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity category;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "product_categories", // Tabla intermedia
+            joinColumns = @JoinColumn(name = "product_id"), // FK hacia products
+            inverseJoinColumns = @JoinColumn(name = "category_id") // FK hacia categories
+    )
+    private Set<CategoryEntity> categories = new HashSet<>();
 
     public String getName() {
         return name;
@@ -61,12 +67,36 @@ public class ProductEntity extends BaseModel {
         this.owner = owner;
     }
 
-    public CategoryEntity getCategory() {
-        return category;
+    public Set<CategoryEntity> getCategories() {
+        return categories;
     }
 
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
+    public void setCategories(Set<CategoryEntity> categories) {
+        this.categories = categories;
     }
+
+    // ============== MÉTODOS DE CONVENIENCIA ==============
+    /**
+     * Agrega una categoría al producto y sincroniza la relación bidireccional
+     */
+    public void addCategory(CategoryEntity category) {
+        this.categories.add(category);
+    }
+
+    /**
+     * Remueve una categoría del producto y sincroniza la relación bidireccional
+     */
+    public void removeCategory(CategoryEntity category) {
+        this.categories.remove(category);
+    }
+
+    /**
+     * Limpia todas las categorías y sincroniza las relaciones
+     */
+    public void clearCategories() {
+
+        this.categories.clear();
+    }
+    // ... resto de getters y setters
 
 }

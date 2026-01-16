@@ -1,5 +1,8 @@
 package ec.edu.ups.icc.fundamentos01.products.models;
 
+import java.util.List;
+import java.util.Set;
+
 import ec.edu.ups.icc.fundamentos01.categories.entity.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.products.dtos.CreateProductDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.PartialUpdateProductDto;
@@ -69,7 +72,7 @@ public class Product {
         return entity;
     }
 
-    public ProductEntity toEntity(UserEntity owner, CategoryEntity category) {
+    public ProductEntity toEntity(UserEntity owner, Set<CategoryEntity> categories) {
         ProductEntity entity = new ProductEntity();
 
         if (this.id != null && this.id > 0) {
@@ -82,7 +85,7 @@ public class Product {
 
         // Asignar relaciones
         entity.setOwner(owner);
-        entity.setCategory(category);
+        entity.setCategories(categories);
 
         return entity;
     }

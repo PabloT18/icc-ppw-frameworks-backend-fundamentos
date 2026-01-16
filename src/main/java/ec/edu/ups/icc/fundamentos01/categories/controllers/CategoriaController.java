@@ -4,7 +4,7 @@ package ec.edu.ups.icc.fundamentos01.categories.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ec.edu.ups.icc.fundamentos01.Fundamentos01Application;
-import ec.edu.ups.icc.fundamentos01.categories.dto.CategoriaResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.dto.CategoryResponseDto;
 import ec.edu.ups.icc.fundamentos01.categories.dto.CreateCategoriaDto;
 import ec.edu.ups.icc.fundamentos01.categories.service.CategoriaService;
 
@@ -35,8 +35,8 @@ public class CategoriaController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<CategoriaResponseDto>> getAll() {
-        List<CategoriaResponseDto> list = categoriaService.getAll();
+    public ResponseEntity<List<CategoryResponseDto>> getAll() {
+        List<CategoryResponseDto> list = categoriaService.getAll();
 
         return ResponseEntity.ok(list);
     }
