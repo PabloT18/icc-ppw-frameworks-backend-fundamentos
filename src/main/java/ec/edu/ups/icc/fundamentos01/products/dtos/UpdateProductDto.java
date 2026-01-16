@@ -17,4 +17,9 @@ public class UpdateProductDto {
 
     @Size(max = 500)
     public String description;
+
+    public Long categoryId;
+
+    /// NO PUEDO ACTUALIZAR EL DUEÑO DEL PRODUCTO
+    /// public Long userId;
 }
