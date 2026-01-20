@@ -2,6 +2,7 @@ package ec.edu.ups.icc.fundamentos01.users.controllers;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
@@ -62,7 +64,32 @@ public class UsersController {
     }
 
     @GetMapping("/{id}/products")
-    public List<ProductResponseDto> getUserProducts(@PathVariable("id") Long id) {
-        return userService.getProductsByUserId(id);
+    public ResponseEntity<List<ProductResponseDto>> getProducts(
+            @PathVariable("id") Long id) {
+
+        List<ProductResponseDto> products = userService.getProductsByUserId(id);
+        return ResponseEntity.ok(products);
+    }
+
+    // ============== ENDPOINT AVANZADO: PRODUCTOS CON FILTROS ==============
+
+    /**
+     * Obtiene productos de un usuario con filtros opcionales
+     * Ejemplo: GET
+     * /api/users/5/products-v2?name=laptop&minPrice=500&maxPrice=2000&categoryId=3
+     */
+
+    @GetMapping("/{id}/products-v2")
+    public ResponseEntity<List<ProductResponseDto>> getProductsWithFilters(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "categoryId", required = false) Long categoryId) {
+
+        List<ProductResponseDto> products = userService.getProductsByUserIdWithFilters(
+                id, name, minPrice, maxPrice, categoryId);
+
+        return ResponseEntity.ok(products);
     }
 }

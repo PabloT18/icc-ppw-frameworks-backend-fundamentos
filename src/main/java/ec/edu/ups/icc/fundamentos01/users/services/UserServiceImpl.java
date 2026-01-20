@@ -1,13 +1,18 @@
 package ec.edu.ups.icc.fundamentos01.users.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoryResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.entity.CategoryEntity;
+import ec.edu.ups.icc.fundamentos01.exceptions.domain.BadRequestException;
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.NotFoundException;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
-import ec.edu.ups.icc.fundamentos01.products.mappers.ProductMapper;
-import ec.edu.ups.icc.fundamentos01.products.models.Product;
+
+import ec.edu.ups.icc.fundamentos01.products.models.ProductEntity;
 import ec.edu.ups.icc.fundamentos01.products.repository.ProductRepository;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
@@ -63,18 +68,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto update(int id, UpdateUserDto dto) {
-        // Optional<UserEntity> userEntity= userRepo.findById((long) id);
-        // if(!userEntity.isPresent()){
-        // throw new IllegalStateException("Usuario no encontrado");
-        // }
-        // userEntity.get().setName(dto.name);
-        // userEntity.get().setEmail(dto.email);
-
-        // userRepo.save(userEntity.get());
-
-        // User responseDto = User.fromEntity(userEntity.get());
-        // UserResponseDto dtoResponse = UserMapper.toResponse(responseDto);
-        // return dtoResponse;
 
         return userRepo.findById((long) id)
                 // Entity → Domain
@@ -139,17 +132,97 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ProductResponseDto> getProductsByUserId(Long userId) {
+
+        // 1. Validar que el usuario existe
+        if (!userRepo.existsById(userId)) {
+            throw new NotFoundException("Usuario no encontrado con ID: " + userId);
+        }
+
+        // 2. Consulta explícita al repositorio correcto
+        List<ProductEntity> products = productRepo.findByOwnerId(userId);
+
+        /*
+         * Flujo correcto:
+         * ProductEntity → ProductResponseDto
+         *
+         * No se pasa por el dominio (Product) porque:
+         * - Es un endpoint de solo lectura (GET)
+         * - No se aplican reglas de negocio
+         * - El dominio no agrega valor en este caso
+         * - Evitamos perder relaciones (user, categories)
+         */
+        // 3. Mapear a DTOs
+        return products.stream()
+                .map(this::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponseDto> getProductsByUserIdWithFilters(
+            Long userId,
+            String name,
+            Double minPrice,
+            Double maxPrice,
+            Long categoryId) {
+
         // Verificar que el usuario existe
         if (!userRepo.existsById(userId)) {
             throw new NotFoundException("Usuario no encontrado");
         }
 
-        // Consultar productos del usuario usando el repositorio de productos
-        return productRepo.findByOwnerId(userId)
-                .stream()
-                .map(Product::fromEntity) // Entity → Domain
-                .map(ProductMapper::toResponse) // Domain → DTO
-                .toList();
+        // 2. Validaciones de filtros
+        if (minPrice != null && minPrice < 0) {
+            throw new BadRequestException("El precio mínimo no puede ser negativo");
+        }
+
+        if (maxPrice != null && maxPrice < 0) {
+            throw new BadRequestException("El precio máximo no puede ser negativo");
+        }
+
+        if (minPrice != null && maxPrice != null && maxPrice < minPrice) {
+            throw new BadRequestException("El precio máximo debe ser mayor o igual al precio mínimo");
+        }
+
+        // 3. Consulta con filtros al repositorio correcto
+        List<ProductEntity> products = productRepo.findByOwnerIdWithFilters(
+                userId, name, minPrice, maxPrice, categoryId);
+
+        // 4. Mapear a DTOs
+        return products.stream()
+                .map(this::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    // ============== MÉTODO HELPER ==============
+
+    /**
+     * Convierte ProductEntity a ProductResponseDto
+     * NOTA: Este método podría estar en un mapper separado para mejor organización
+     */
+    private ProductResponseDto toResponseDto(ProductEntity entity) {
+        ProductResponseDto dto = new ProductResponseDto();
+        dto.id = entity.getId();
+        dto.name = entity.getName();
+        dto.price = entity.getPrice();
+        dto.description = entity.getDescription();
+
+        ProductResponseDto.UserSummaryDto ownerDto = new ProductResponseDto.UserSummaryDto();
+        ownerDto.id = entity.getOwner().getId();
+        ownerDto.name = entity.getOwner().getName();
+        ownerDto.email = entity.getOwner().getEmail();
+
+        List<CategoryResponseDto> categoryDtos = new ArrayList<>();
+        for (CategoryEntity categoryEntity : entity.getCategories()) {
+            CategoryResponseDto categoryDto = new CategoryResponseDto();
+            categoryDto.id = categoryEntity.getId();
+            categoryDto.name = categoryEntity.getName();
+            categoryDto.description = categoryEntity.getDescription();
+            categoryDtos.add(categoryDto);
+        }
+        dto.user = ownerDto;
+        dto.categories = categoryDtos;
+        return dto;
+
     }
 
 }

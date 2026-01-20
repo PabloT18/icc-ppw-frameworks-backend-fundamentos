@@ -30,6 +30,7 @@ public class Product {
         this.name = name;
         this.price = price;
         this.description = description;
+        this.createdAt = java.time.LocalDateTime.now().toString();
     }
 
     private void validateBusinessRules(String name, Double price, String description) {
@@ -99,6 +100,7 @@ public class Product {
                 entity.getPrice(),
                 entity.getDescription());
         product.id = entity.getId();
+
         return product;
     }
 
