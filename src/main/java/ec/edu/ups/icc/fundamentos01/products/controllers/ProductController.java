@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -24,6 +26,7 @@ import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
 
 import ec.edu.ups.icc.fundamentos01.products.services.ProductService;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 
 @RestController
@@ -36,10 +39,21 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // @PostMapping
+    // public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody
+    // CreateProductDto dto) {
+    // ProductResponseDto created = productService.create(dto);
+    // return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    // }
+
     @PostMapping
-    public ResponseEntity<ProductResponseDto> create(@Valid @RequestBody CreateProductDto dto) {
-        ProductResponseDto created = productService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<ProductResponseDto> create(
+            @Valid @RequestBody CreateProductDto createProductDto,
+            @AuthenticationPrincipal UserDetailsImpl currentUser) { // Inyecta usuario actual
+
+        // Crea producto y lo asocia al usuario actual
+        ProductResponseDto product = productService.create(createProductDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @GetMapping

@@ -30,6 +30,23 @@ dependencies {
 
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 
+	// Spring Security
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	
+	// JWT - JSON Web Token
+	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
+	// Jackson para manejo de fechas Java 8+
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	
+
+	testImplementation("org.springframework.security:spring-security-test")
+
+	
+
+
 }
 
 tasks.withType<Test> {

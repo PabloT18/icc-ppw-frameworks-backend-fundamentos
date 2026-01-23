@@ -16,4 +16,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<ProductEntity> findByName(String name);
 
+    // ============== NUEVOS MÉTODOS PARA SEGURIDAD ==============
+
+    boolean existsByEmail(String email);
+
 }
