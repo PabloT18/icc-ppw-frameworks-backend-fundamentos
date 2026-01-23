@@ -1,11 +1,14 @@
 package ec.edu.ups.icc.fundamentos01.users.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import ec.edu.ups.icc.fundamentos01.core.entities.BaseModel;
 import ec.edu.ups.icc.fundamentos01.products.models.ProductEntity;
-
+import ec.edu.ups.icc.fundamentos01.security.models.RoleEntity;
+import ec.edu.ups.icc.fundamentos01.security.models.RoleName;
 import jakarta.persistence.*;
 
 @Entity
@@ -27,6 +30,45 @@ public class UserEntity extends BaseModel {
      */
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products = new ArrayList<>();
+
+    /**
+     * Relación ManyToMany con Roles
+     * 
+     * @ManyToMany: Un usuario puede tener múltiples roles
+     *              Un rol puede estar asignado a múltiples usuarios
+     * 
+     *              fetch = FetchType.EAGER:
+     *              - Carga los roles AUTOMÁTICAMENTE al consultar el usuario
+     *              - Necesario porque Spring Security necesita los roles al
+     *              autenticar
+     *              - Sin EAGER, tendríamos LazyInitializationException al acceder a
+     *              roles
+     * 
+     * @JoinTable: Crea tabla intermedia user_roles
+     *             name = "user_roles": Nombre de la tabla intermedia en BD
+     *             joinColumns: Columna que referencia a esta entidad (users.id)
+     *             inverseJoinColumns: Columna que referencia a RoleEntity
+     *             (roles.id)
+     * 
+     *             Tabla user_roles en BD:
+     *             CREATE TABLE user_roles (
+     *             user_id BIGINT REFERENCES users(id),
+     *             role_id BIGINT REFERENCES roles(id),
+     *             PRIMARY KEY (user_id, role_id)
+     *             );
+     * 
+     *             Set<RoleEntity>:
+     *             - Set (no List) evita duplicados
+     *             - HashSet inicializado para evitar NullPointerException
+     * 
+     *             Ejemplo de uso:
+     *             UserEntity user = userRepository.findById(1L);
+     *             user.getRoles(); // ← Ya cargados por EAGER
+     *             // → [RoleEntity(ROLE_USER), RoleEntity(ROLE_ADMIN)]
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 
     public String getName() {
         return name;
@@ -52,4 +94,37 @@ public class UserEntity extends BaseModel {
         this.password = password;
     }
 
+    public List<ProductEntity> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<ProductEntity> products) {
+        this.products = products;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
+    // ============== MÉTODOS HELPER ==============
+
+    /**
+     * Agrega un rol al usuario
+     */
+    public void addRole(RoleEntity role) {
+        this.roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol específico
+     */
+    public boolean hasRole(RoleName roleName) {
+        return this.roles.stream()
+                .anyMatch(role -> role.getName().equals(roleName));
+    }
 }
