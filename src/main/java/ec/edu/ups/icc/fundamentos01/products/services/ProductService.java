@@ -8,50 +8,51 @@ import org.springframework.data.domain.Slice;
 import ec.edu.ups.icc.fundamentos01.products.dtos.CreateProductDto;
 
 import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductDto;
+import ec.edu.ups.icc.fundamentos01.security.services.UserDetailsImpl;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
 
 public interface ProductService {
 
-    ProductResponseDto create(CreateProductDto dto);
+        ProductResponseDto create(CreateProductDto dto);
 
-    List<ProductResponseDto> findAll();
+        List<ProductResponseDto> findAll();
 
-    ProductResponseDto findById(Long id);
+        ProductResponseDto findById(Long id);
 
-    List<ProductResponseDto> findByUserId(Long id);
+        List<ProductResponseDto> findByUserId(Long id);
 
-    List<ProductResponseDto> findByCategoryId(Long id);
+        List<ProductResponseDto> findByCategoryId(Long id);
 
-    ProductResponseDto update(Long id, UpdateProductDto dto);
+        ProductResponseDto update(Long id, UpdateProductDto dto, UserDetailsImpl currentUser);
 
-    void delete(Long id);
+        void delete(Long id, UserDetailsImpl currentUser);
 
-    Page<ProductResponseDto> findAllPaginado(int page, int size, String[] sort);
+        Page<ProductResponseDto> findAllPaginado(int page, int size, String[] sort);
 
-    Slice<ProductResponseDto> findAllSlice(int page, int size, String[] sort);
+        Slice<ProductResponseDto> findAllSlice(int page, int size, String[] sort);
 
-    /**
-     * Busca productos con filtros opcionales y paginación
-     */
-    Page<ProductResponseDto> findWithFilters(
-            String name,
-            Double minPrice,
-            Double maxPrice,
-            Long categoryId,
-            int page,
-            int size,
-            String[] sort);
+        /**
+         * Busca productos con filtros opcionales y paginación
+         */
+        Page<ProductResponseDto> findWithFilters(
+                        String name,
+                        Double minPrice,
+                        Double maxPrice,
+                        Long categoryId,
+                        int page,
+                        int size,
+                        String[] sort);
 
-    /**
-     * Productos de un usuario con filtros opcionales y paginación
-     */
-    Page<ProductResponseDto> findByUserIdWithFilters(
-            Long userId,
-            String name,
-            Double minPrice,
-            Double maxPrice,
-            Long categoryId,
-            int page,
-            int size,
-            String[] sort);
+        /**
+         * Productos de un usuario con filtros opcionales y paginación
+         */
+        Page<ProductResponseDto> findByUserIdWithFilters(
+                        Long userId,
+                        String name,
+                        Double minPrice,
+                        Double maxPrice,
+                        Long categoryId,
+                        int page,
+                        int size,
+                        String[] sort);
 }

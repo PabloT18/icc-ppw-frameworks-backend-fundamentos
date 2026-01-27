@@ -2,11 +2,15 @@ package ec.edu.ups.icc.fundamentos01.users.models;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Set;
 
 import ec.edu.ups.icc.fundamentos01.core.entities.BaseModel;
 import ec.edu.ups.icc.fundamentos01.products.models.ProductEntity;
+import ec.edu.ups.icc.fundamentos01.security.models.RoleEntity;
+import ec.edu.ups.icc.fundamentos01.security.models.RoleName;
 import ec.edu.ups.icc.fundamentos01.security.models.RoleEntity;
 import ec.edu.ups.icc.fundamentos01.security.models.RoleName;
 import jakarta.persistence.*;
