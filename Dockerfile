@@ -1,5 +1,7 @@
 
 # docker images
+# docker build -t server-springap .
+
 
 
 
